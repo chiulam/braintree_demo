@@ -11,51 +11,59 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 let gateway = require('../gateway');
-
 let index = fs.readFileSync(__dirname + '/index.html', 'utf8');
 
 app.get('/', function (req, res) {
 	res.send('secure server');
 });
 
+/*
+	Generate web frontend
+*/
 app.get('/index', function (req, res) {
+	// Get token
 	gateway.clientToken.generate({}, function (err, response) {
 		if (err) {
-			console.log('o no err!');
 			console.log(err);
 		} else {
 			console.log('clientToken!!');
 			console.log(response.clientToken);
+			// replace token in FE code
 			res.send(index.replace('CLIENT-TOKEN-FROM-SERVER', response.clientToken));
 		}
 	});
 });
 
+/*
+	Create payment method
+*/
 app.post('/add_paypal_as_payment_method', function (req, res) {
-	console.log(req.body);
-	console.log(req.form);
 	let nonceFromTheClient = req.body.payment_method_nonce;
-	// Use payment method nonce here
 
+	// Use payment method nonce here
 	console.log('nonceFromTheClient!!!');
 	console.log(nonceFromTheClient);
 
-	// gateway.customer.create({
-	// 	firstName: 'Charity',
-	// 	lastName: 'Smith Paypal',
-	// 	paymentMethodNonce: nonceFromTheClient
-	// }, function (err, result) {
-	// 	console.log(result.success);
-	// 	// true
-	//
-	// 	console.log(result.customer);
-	// 	// e.g 160923
-	//
-	// 	// console.log(result.customer.paymentMethods[0].token);
-	// 	// e.g f28wm
-	// });
 
-	res.send('nonce = ' + nonceFromTheClient);
+	// Create customer first
+	let id = 'demo_user';
+	gateway.customer.create({
+		id: id,
+		firstName: 'Demo',
+		lastName: 'Zero One'
+	}, function (err, result) {
+		console.log(result.success);
+		console.log(result.customer);
+
+		// Create paymentMethods with nonceFromTheClient
+		gateway.paymentMethod.create({
+			customerId: id,
+			paymentMethodNonce: nonceFromTheClient,
+			token: id + '_001'
+		}, function (err1, result1) {
+			res.send('nonce = ' + nonceFromTheClient);
+		});
+	});
 });
 
 app.listen(3001, function () {

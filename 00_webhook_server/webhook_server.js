@@ -15,6 +15,9 @@ app.get('/', function (req, res) {
 	res.send('webhook server');
 });
 
+/*
+	Endpoint for receive webhook
+*/
 app.post('/webhooks', function (req, res) {
 	// console.log('-------------- raw response');
 	// console.log(req.body);
