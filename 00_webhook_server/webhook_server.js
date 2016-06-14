@@ -4,25 +4,21 @@ let fs = require('fs');
 let express = require('express');
 let bodyParser = require('body-parser');
 let app = express();
-let braintree = require('braintree');
-let credential = require('../credential');
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 	extended: true
 }));
 
-let gateway = braintree.connect({
-	environment: braintree.Environment.Sandbox,
-	merchantId: credential.merchantId,
-	publicKey: credential.publicKey,
-	privateKey: credential.privateKey
-});
+let gateway = require('../gateway');
 
 app.get('/', function (req, res) {
 	res.send('webhook server');
 });
 
 app.post('/webhooks', function (req, res) {
+	// console.log('-------------- raw response');
+	// console.log(req.body);
+
 	gateway.webhookNotification.parse(
 		req.body.bt_signature,
 		req.body.bt_payload,

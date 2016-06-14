@@ -5,18 +5,12 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let app = express();
 let braintree = require('braintree');
-let credential = require('../credential');
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 	extended: true
 }));
 
-let gateway = braintree.connect({
-	environment: braintree.Environment.Sandbox,
-	merchantId: credential.merchantId,
-	publicKey: credential.publicKey,
-	privateKey: credential.privateKey
-});
+let gateway = require('../gateway');
 
 let index = fs.readFileSync(__dirname + '/index.html', 'utf8');
 
@@ -27,7 +21,7 @@ app.get('/', function (req, res) {
 app.get('/index', function (req, res) {
 	gateway.clientToken.generate({}, function (err, response) {
 		if (err) {
-			console.log('fuck!');
+			console.log('o no err!');
 			console.log(err);
 		} else {
 			console.log('clientToken!!');
