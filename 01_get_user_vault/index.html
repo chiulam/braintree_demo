@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+	<form id="merchant-form" action="/paypal" method="post">
+		<div id="paypal-container"></div>
+	</form>
+	<script src="https://js.braintreegateway.com/js/braintree-2.24.1.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script type="text/javascript">
+	braintree.setup('CLIENT-TOKEN-FROM-SERVER', 'custom', {
+		paypal: {
+			container: 'paypal-container',
+			singleUse: false,
+		},
+		dataCollector: {
+			paypal: true
+		},
+		onPaymentMethodReceived: function (obj) {
+			// console.log(obj.nonce);
+			// $.ajax({
+			// 	type: "POST",
+			// 	url: 'create-transaction',
+			// 	data: {
+			// 		nonce: obj.nonce
+			// 	},
+			// 	success: success,
+			// 	dataType: dataType
+			// });
+
+			var formData = $("#merchant-form").serializeArray();
+			formData.push({name: "payment_method_nonce", value: obj.nonce});
+
+			$.post("create-transaction", formData)
+			.done(function(data) {
+				alert(data);
+				location.reload();
+			});
+		}
+	});
+	</script>
+</body>
+</html>
