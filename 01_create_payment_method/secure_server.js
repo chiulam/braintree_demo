@@ -30,6 +30,7 @@ app.get('/index', function (req, res) {
 			console.log(response.clientToken);
 			// replace token in FE code
 			res.send(index.replace('CLIENT-TOKEN-FROM-SERVER', response.clientToken));
+			// res.send(index);
 		}
 	});
 });
